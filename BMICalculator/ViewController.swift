@@ -149,7 +149,7 @@ class ViewController: UIViewController {
         let height = heightTextField.text ?? ""
         let weight = weightTextField.text ?? ""
         
-        let pattern: String = "^[0-9]*$"
+        let pattern: String = "^(?:|0|[1-9]\\d*)(?:\\.\\d*)?$"
         
         if let _ = height.range(of: pattern, options: .regularExpression) {
             self.isEnabledHeight = height.isEmpty ? false : true
