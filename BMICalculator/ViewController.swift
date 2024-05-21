@@ -14,25 +14,17 @@ enum Warnig {
 class ViewController: UIViewController {
 
     @IBOutlet var mainTitleLabelList: [UILabel]!
-    
     @IBOutlet weak var mainImageView: UIImageView!
-    
     @IBOutlet var subTitleLabelList: [UILabel]!
     
-    
     @IBOutlet var textFieldBackgroudViewList: [UIView]!
-    
     @IBOutlet weak var heightTextField: UITextField!
-    
     @IBOutlet weak var weightTextField: UITextField!
-    
     @IBOutlet weak var weightSecureButton: UIButton!
-    
     @IBOutlet var warnigLabelList: [UILabel]!
     
     
     @IBOutlet weak var randomBMICalcButton: UIButton!
-    
     @IBOutlet weak var submitButton: UIButton!
     
     private var isSecure = true
