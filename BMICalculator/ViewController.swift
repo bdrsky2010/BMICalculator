@@ -30,6 +30,7 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var randomBMICalcButton: UIButton!
     @IBOutlet weak var submitButton: UIButton!
+    @IBOutlet weak var resetButton: UIButton!
     
     private var isSecure = true
     private var isEnabledHeight = false
@@ -73,6 +74,7 @@ class ViewController: UIViewController {
         configUserTextField()
         configRandomButton()
         configSubmitButton()
+        configResetButton()
     }
     
     private func configTitleLabel() {
@@ -258,12 +260,8 @@ class ViewController: UIViewController {
     }
     
     private func configSubmitButton() {
-        self.submitButton.setTitle("결과 확인", for: .normal)
-        self.submitButton.titleLabel?.font = .systemFont(ofSize: 20)
-        self.submitButton.titleLabel?.textColor = .white
-        self.submitButton.layer.cornerRadius = 15
-        self.submitButton.tintColor = .white
-        self.submitButton.backgroundColor = .purple
+        configButton(self.submitButton, title: "결과 확인")
+        
         self.submitButton.isEnabled = {
             loadUserDefault()
             
@@ -275,6 +273,19 @@ class ViewController: UIViewController {
             
             return isEnabledHeight && isEnabledWeight
         }()
+    }
+    
+    private func configResetButton() {
+        configButton(self.resetButton, title: "리셋")
+    }
+    
+    private func configButton(_ button: UIButton,
+                              title: String) {
+        button.setTitle(title, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 20)
+        button.layer.cornerRadius = 15
+        button.tintColor = .white
+        button.backgroundColor = .purple
     }
     
     // 소수점 둘째자리에서 반올림하는 메서드
@@ -351,6 +362,13 @@ class ViewController: UIViewController {
         present(alert, animated: true)
     }
     
+    @IBAction func resetButtonClicked(_ sender: UIButton) {
+        self.heightTextField.text = nil
+        self.weightTextField.text = nil
+        self.submitButton.isEnabled = false
+        saveUserDefault()
+        view.endEditing(true)
+    }
     
     @IBAction func dismissKeyboard(_ sender: Any) {
         view.endEditing(true)
