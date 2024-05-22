@@ -11,6 +11,10 @@ enum Warnig {
     case success, failure
 }
 
+enum Category {
+    case height, weight
+}
+
 class ViewController: UIViewController {
 
     @IBOutlet var mainTitleLabelList: [UILabel]!
@@ -31,9 +35,34 @@ class ViewController: UIViewController {
     private var isEnabledHeight = false
     private var isEnabledWeight = false
     
+    private let heightKey = "height"
+    private let weightKey = "weight"
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         configUI()
+    }
+    
+    private func saveUserDefault() {
+        guard let height = heightTextField.text, let weight = weightTextField.text else {
+            print("UserDefault 저장 실패")
+            return
+        }
+        UserDefaults.standard.set(height, forKey: heightKey)
+        UserDefaults.standard.set(weight, forKey: weightKey)
+        print("UserDefault 저장 성공")
+    }
+    
+    private func loadUserDefault() {
+        guard let height = UserDefaults.standard.string(forKey: heightKey),
+              let weight = UserDefaults.standard.string(forKey: weightKey) else {
+            print("UserDefault 불러오기 실패")
+            return
+        }
+        
+        self.heightTextField.text = height
+        self.weightTextField.text = weight
+        print("UserDefault 불러오기 성공")
     }
 
     private func configUI() {
@@ -142,6 +171,35 @@ class ViewController: UIViewController {
         configSecureButton()
     }
     
+    // TextField의 Text가 사용가능한 상태인지 판단하는 메서드
+    @discardableResult
+    private func checkTextFieldText(_ text: String, category: Category) -> Bool {
+        let pattern: String = "^(?:|0|[1-9]\\d*)(?:\\.\\d*)?$"
+        
+        if let _ = text.range(of: pattern, options: .regularExpression), !text.isEmpty {
+            
+            switch category {
+            case .height:
+                self.isEnabledHeight = true
+            case .weight:
+                self.isEnabledWeight = true
+            }
+            self.isEnabledHeight = true
+            
+            return true
+        } else {
+            
+            switch category {
+            case .height:
+                self.isEnabledHeight = false
+            case .weight:
+                self.isEnabledWeight = false
+            }
+            
+            return false
+        }
+    }
+    
     @IBAction func changedTextFieldText(_ sender: UITextField) {
         var warningHeight: Warnig = .failure
         var warningWeight: Warnig = .failure
@@ -149,21 +207,15 @@ class ViewController: UIViewController {
         let height = heightTextField.text ?? ""
         let weight = weightTextField.text ?? ""
         
-        let pattern: String = "^(?:|0|[1-9]\\d*)(?:\\.\\d*)?$"
-        
-        if let _ = height.range(of: pattern, options: .regularExpression) {
-            self.isEnabledHeight = height.isEmpty ? false : true
-            warningHeight = height.isEmpty ? .failure : .success
+        if checkTextFieldText(height, category: .height) {
+            warningHeight = .success
         } else {
-            self.isEnabledHeight = false
             warningHeight = .failure
         }
         
-        if let _ = weight.range(of: pattern, options: .regularExpression) {
-            self.isEnabledWeight = weight.isEmpty ? false : true
-            warningWeight = weight.isEmpty ? .failure : .success
+        if checkTextFieldText(weight, category: .weight) {
+            warningWeight = .success
         } else {
-            self.isEnabledWeight = false
             warningWeight = .failure
         }
         
@@ -180,6 +232,7 @@ class ViewController: UIViewController {
         self.submitButton.isEnabled = isEnabledHeight && isEnabledWeight
     }
     
+    // 사용가능 유무에 따라 TextField를 감싸는 super view의 border color 세팅
     private func configWarningTextField(view: UIView, isEnabled: Bool) {
         view.layer.borderColor = isEnabled ? UIColor.darkGray.cgColor : UIColor.red.cgColor
     }
@@ -211,9 +264,20 @@ class ViewController: UIViewController {
         self.submitButton.layer.cornerRadius = 15
         self.submitButton.tintColor = .white
         self.submitButton.backgroundColor = .purple
-        self.submitButton.isEnabled = false
+        self.submitButton.isEnabled = {
+            loadUserDefault()
+            
+            let height = heightTextField.text ?? ""
+            let weight = weightTextField.text ?? ""
+            
+            checkTextFieldText(height, category: .height)
+            checkTextFieldText(weight, category: .weight)
+            
+            return isEnabledHeight && isEnabledWeight
+        }()
     }
     
+    // 소수점 둘째자리에서 반올림하는 메서드
     private func roundTwo(num: Double) -> Double {
         let digit: Double = 10.0
         return round(num * digit) / digit
@@ -271,6 +335,8 @@ class ViewController: UIViewController {
                 message = "bmi 측정 결과: \(bmi)\n비만입니다."
             }
         }
+        
+        saveUserDefault()
         
         // 1. alert 창 구성
         let alert = UIAlertController(title: title,
