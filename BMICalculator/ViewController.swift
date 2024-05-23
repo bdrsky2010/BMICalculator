@@ -36,12 +36,23 @@ class ViewController: UIViewController {
     private var isEnabledHeight = false
     private var isEnabledWeight = false
     
+    private let nicknameKey = "nickname"
     private let heightKey = "height"
     private let weightKey = "weight"
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         configUI()
+    }
+    
+    private func saveUserDefaultNickname(nickname: String) {
+        UserDefaults.standard.set(nickname, forKey: nicknameKey)
+    }
+    
+    private func loadUserDefaultNickname() {
+        guard let nickname = UserDefaults.standard.string(forKey: nicknameKey) else { return }
+        (navigationItem.titleView as! UILabel).text = nickname + " 님 안녕하세요."
     }
     
     private func saveUserDefault() {
@@ -67,6 +78,7 @@ class ViewController: UIViewController {
     }
 
     private func configUI() {
+        configNaviBarNickname()
         configTitleLabel()
         configImage()
         configSubTitle()
@@ -75,6 +87,53 @@ class ViewController: UIViewController {
         configRandomButton()
         configSubmitButton()
         configResetButton()
+    }
+    
+    private func configNaviBarNickname() {
+        let titleView = UILabel()
+        titleView.text = "닉네임"
+        titleView.font = .systemFont(ofSize: 17, weight: .semibold)
+        titleView.textAlignment = .center
+        
+        let gesture = UITapGestureRecognizer(target: self, action: #selector(naviBarTitleTapped))
+        titleView.isUserInteractionEnabled = true
+        titleView.addGestureRecognizer(gesture)
+        
+        navigationItem.titleView = titleView
+        
+        loadUserDefaultNickname()
+    }
+    
+    @objc
+    private func naviBarTitleTapped() {
+        print(#function)
+        // 1. alert 창 구성
+        let title = "프로필 설정"
+        let alert = UIAlertController(title: title,
+                                      message: nil,
+                                      preferredStyle: .alert)
+        
+        alert.addTextField { textField in
+            textField.placeholder = "닉네임을 입력해주세요."
+        }
+        
+        // 2. alert button 구성
+        let save = UIAlertAction(title: "저장", style: .default) { _ in
+            if let nickname = alert.textFields![0].text {
+                
+                let titleView = self.navigationItem.titleView as! UILabel
+                titleView.text = nickname + " 님 안녕하세요."
+                
+                self.saveUserDefaultNickname(nickname: nickname)
+            }
+        }
+        let cancel = UIAlertAction(title: "취소", style: .cancel)
+        
+        // 3. alert에 button 추가
+        alert.addAction(cancel)
+        alert.addAction(save)
+        
+        present(alert, animated: true)
     }
     
     private func configTitleLabel() {
