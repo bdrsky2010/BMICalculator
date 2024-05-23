@@ -121,6 +121,7 @@ class ViewController: UIViewController {
             
             // 저장된 닉네임이 있으면 textField에 해당 닉네임 띄어주기
             if let nickname, !nickname.isEmpty {
+                // " 님 안녕하세요. 만큼의 문자열 제거"
                 textField.text = String(nickname.prefix(nickname.count - 9))
             }
         }
