@@ -127,12 +127,13 @@ class ViewController: UIViewController {
         }
         
         // 2. alert button 구성
-        let save = UIAlertAction(title: "저장", style: .default) { [weak titleView = (self.navigationItem.titleView as! UILabel)] _ in
+        let save = UIAlertAction(title: "저장", style: .default) { [weak self] _ in
+            guard let self else { return }
+            
             if let nickname = alert.textFields![0].text {
+                saveUserDefaultNickname(nickname: nickname)
                 
-                self.saveUserDefaultNickname(nickname: nickname)
-                
-                titleView?.text = nickname + " 님 안녕하세요."
+                (navigationItem.titleView as! UILabel).text = nickname + " 님 안녕하세요."
             }
         }
         let cancel = UIAlertAction(title: "취소", style: .cancel)
