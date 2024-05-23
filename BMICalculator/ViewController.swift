@@ -114,7 +114,15 @@ class ViewController: UIViewController {
                                       preferredStyle: .alert)
         
         alert.addTextField { textField in
+            let titleView = self.navigationItem.titleView as! UILabel
+            let nickname = titleView.text
+            
             textField.placeholder = "닉네임을 입력해주세요."
+            
+            // 저장된 닉네임이 있으면 textField에 해당 닉네임 띄어주기
+            if let nickname, !nickname.isEmpty {
+                textField.text = String(nickname.prefix(nickname.count - 9))
+            }
         }
         
         // 2. alert button 구성
