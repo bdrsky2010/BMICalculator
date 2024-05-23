@@ -95,6 +95,7 @@ class ViewController: UIViewController {
         titleView.font = .systemFont(ofSize: 17, weight: .semibold)
         titleView.textAlignment = .center
         
+        
         let gesture = UITapGestureRecognizer(target: self, action: #selector(naviBarTitleTapped))
         titleView.isUserInteractionEnabled = true
         titleView.addGestureRecognizer(gesture)
@@ -114,26 +115,24 @@ class ViewController: UIViewController {
                                       preferredStyle: .alert)
         
         alert.addTextField { textField in
-            let titleView = self.navigationItem.titleView as! UILabel
-            let nickname = titleView.text
+            let nickname = UserDefaults.standard.string(forKey: self.nicknameKey)
             
             textField.placeholder = "닉네임을 입력해주세요."
             
             // 저장된 닉네임이 있으면 textField에 해당 닉네임 띄어주기
-            if let nickname, !nickname.isEmpty {
+            if let nickname = nickname, !nickname.isEmpty {
                 // " 님 안녕하세요. 만큼의 문자열 제거"
-                textField.text = String(nickname.prefix(nickname.count - 9))
+                textField.text = nickname
             }
         }
         
         // 2. alert button 구성
-        let save = UIAlertAction(title: "저장", style: .default) { _ in
+        let save = UIAlertAction(title: "저장", style: .default) { [weak titleView = (self.navigationItem.titleView as! UILabel)] _ in
             if let nickname = alert.textFields![0].text {
                 
-                let titleView = self.navigationItem.titleView as! UILabel
-                titleView.text = nickname + " 님 안녕하세요."
-                
                 self.saveUserDefaultNickname(nickname: nickname)
+                
+                titleView?.text = nickname + " 님 안녕하세요."
             }
         }
         let cancel = UIAlertAction(title: "취소", style: .cancel)
