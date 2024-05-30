@@ -17,6 +17,10 @@ enum Category {
 
 class ViewController: UIViewController {
 
+    static let nicknameKey = "nickname"
+    static let heightKey = "height"
+    static let weightKey = "weight"
+    
     @IBOutlet var mainTitleLabelList: [UILabel]!
     @IBOutlet weak var mainImageView: UIImageView!
     @IBOutlet var subTitleLabelList: [UILabel]!
@@ -27,7 +31,6 @@ class ViewController: UIViewController {
     @IBOutlet weak var weightSecureButton: UIButton!
     @IBOutlet var warnigLabelList: [UILabel]!
     
-    
     @IBOutlet weak var randomBMICalcButton: UIButton!
     @IBOutlet weak var submitButton: UIButton!
     @IBOutlet weak var resetButton: UIButton!
@@ -35,10 +38,7 @@ class ViewController: UIViewController {
     private var isSecure = true
     private var isEnabledHeight = false
     private var isEnabledWeight = false
-    
-    private let nicknameKey = "nickname"
-    private let heightKey = "height"
-    private let weightKey = "weight"
+    private var userDefaultsHelper = UserDefaultsHelper()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,12 +46,8 @@ class ViewController: UIViewController {
         configUI()
     }
     
-    private func saveUserDefaultNickname(nickname: String) {
-        UserDefaults.standard.set(nickname, forKey: nicknameKey)
-    }
-    
     private func loadUserDefaultNickname() {
-        guard let nickname = UserDefaults.standard.string(forKey: nicknameKey) else { return }
+        guard let nickname = userDefaultsHelper.nickname else { return }
         (navigationItem.titleView as! UILabel).text = nickname + " 님 안녕하세요."
     }
     
@@ -60,14 +56,14 @@ class ViewController: UIViewController {
             print("UserDefault 저장 실패")
             return
         }
-        UserDefaults.standard.set(height, forKey: heightKey)
-        UserDefaults.standard.set(weight, forKey: weightKey)
+        userDefaultsHelper.height = height
+        userDefaultsHelper.weight = weight
         print("UserDefault 저장 성공")
     }
     
     private func loadUserDefault() {
-        guard let height = UserDefaults.standard.string(forKey: heightKey),
-              let weight = UserDefaults.standard.string(forKey: weightKey) else {
+        guard let height = userDefaultsHelper.height,
+              let weight = userDefaultsHelper.weight else {
             print("UserDefault 불러오기 실패")
             return
         }
@@ -115,7 +111,7 @@ class ViewController: UIViewController {
                                       preferredStyle: .alert)
         
         alert.addTextField { textField in
-            let nickname = UserDefaults.standard.string(forKey: self.nicknameKey)
+            let nickname = UserDefaults.standard.string(forKey: ViewController.nicknameKey)
             
             textField.placeholder = "닉네임을 입력해주세요."
             
@@ -131,7 +127,7 @@ class ViewController: UIViewController {
             guard let self else { return }
             
             if let nickname = alert.textFields![0].text {
-                saveUserDefaultNickname(nickname: nickname)
+                userDefaultsHelper.nickname = nickname
                 
                 (navigationItem.titleView as! UILabel).text = nickname + " 님 안녕하세요."
             }
@@ -442,4 +438,3 @@ class ViewController: UIViewController {
         view.endEditing(true)
     }
 }
-
